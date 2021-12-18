@@ -1,1 +1,1 @@
-# BinanceBot
+# BinanceTradingBot
