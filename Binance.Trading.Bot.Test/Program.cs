@@ -1,7 +1,5 @@
 ﻿using Binance.Trading.Bot.Models;
 using System;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Binance.Trading.Bot.Test
@@ -12,10 +10,7 @@ namespace Binance.Trading.Bot.Test
         {
             Console.WriteLine("Kline: " + kline.Symbol);
         }
-        static void OnAggTradeDataReceived(AggTrade aggTrade)
-        {
-            Console.WriteLine("AggTrade: " + aggTrade.Symbol);
-        }
+  
         static void Main(string[] args)
         {
             WSDataReceiver wSDataReceiver = new();

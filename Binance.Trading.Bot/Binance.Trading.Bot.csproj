@@ -8,4 +8,14 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="TA-Lib-Core">
+      <HintPath>Lib\TA-Lib-Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Strategies\" />
+  </ItemGroup>
+
 </Project>
