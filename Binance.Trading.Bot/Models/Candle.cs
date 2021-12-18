@@ -1,8 +1,12 @@
 ﻿using Newtonsoft.Json;
+using System;
+
 namespace Binance.Trading.Bot.Models
 {
     public class Candle
     {
+        public DateTime Timestamp { get; set; }
+
         [JsonProperty("o")]
         public decimal Open { get; set; }
 

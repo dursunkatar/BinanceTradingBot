@@ -9,6 +9,8 @@ namespace Binance.Trading.Bot.Strategies
     public class RsiMacd : BaseStrategy
     {
         public override string Name => "RSI MACD";
+        public override int MinimumAmountOfCandles => 52;
+        public override Period IdealPeriod => Period.Minute;
 
         public override TradeAdvice Forecast(List<Candle> candles)
         {

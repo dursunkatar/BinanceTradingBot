@@ -9,5 +9,8 @@ namespace Binance.Trading.Bot.Models
 
         [JsonProperty("k")]
         public Candle Candle { get; set; }
+
+        [JsonProperty("e")]
+        public double UnixTimestamp { get; set; }
     }
 }
