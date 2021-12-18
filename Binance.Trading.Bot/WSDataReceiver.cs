@@ -1,6 +1,4 @@
-﻿using Binance.Trading.Bot.Models;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
@@ -13,15 +11,16 @@ namespace Binance.Trading.Bot
     public class WSDataReceiver
     {
         private readonly ClientWebSocket socket;
-        private readonly List<string> SubscribeRequestParams;
+        private readonly List<string> subscribeRequestParams;
+        private readonly Dictionary<string, HandleReceivedData> handlers;
 
         public delegate void HandleReceivedData(string data);
-        public event HandleReceivedData handleDataFunc;
 
         public WSDataReceiver()
         {
             socket = new();
-            SubscribeRequestParams = new();
+            handlers = new();
+            subscribeRequestParams = new();
         }
 
         public async Task StartReceiver()
@@ -30,41 +29,54 @@ namespace Binance.Trading.Bot
                 return;
 
             await socket.ConnectAsync(new Uri("wss://stream.binance.com:9443/ws"), CancellationToken.None);
-            await Subscribe();
+            await subscribe();
+            await ReceiveData();
+        }
 
-            Thread readThread = new Thread(
-              async delegate (object obj)
-              {
-                  byte[] recBytes = new byte[2048];
-                  while (true)
-                  {
-                      var arraySegment = new ArraySegment<byte>(recBytes);
-                      var receiveAsync = await socket.ReceiveAsync(arraySegment, CancellationToken.None);
-                      string jsonString = Encoding.UTF8.GetString(recBytes);
-                      Task handleTask = new Task(() => handleDataFunc(jsonString));
-                      handleTask.Start();
-                      recBytes = new byte[1024];
-                  }
-              });
-            readThread.Start();
-        }
-        private async Task Subscribe()
+        private Task ReceiveData()
         {
-            var request = new SubscribeRequest { Id = 1, Params = SubscribeRequestParams };
-            string js = JsonConvert.SerializeObject(request);
-            byte[] bytes = Encoding.UTF8.GetBytes(js);
-            var arraySegment = new ArraySegment<byte>(bytes);
-            await socket.SendAsync(arraySegment, WebSocketMessageType.Text, true, CancellationToken.None);
+            Task task = new Task(async () =>
+           {
+               byte[] recBytes = new byte[2048];
+               while (true)
+               {
+                   string jsonString = await Utility.GetWSStreamReceivedData(socket);
+
+                   //Task handleTask = new Task(() => handleDataFunc(jsonString));
+                   //handleTask.Start();
+               }
+           });
+            task.Start();
+            return task;
         }
-        public WSDataReceiver SubscribeKline(params string[] sysmbols) => AddSubscribeParams(sysmbols, "@kline_1m");
-        public WSDataReceiver SubscribeAggTrade(params string[] sysmbols) => AddSubscribeParams(sysmbols, "@aggTrade");
-        private WSDataReceiver AddSubscribeParams(string[] sysmbols, string paramType)
+        private async Task subscribe()
         {
-            SubscribeRequestParams.AddRange(
-               sysmbols.Where(s => !SubscribeRequestParams.Any(x => x == string.Concat(s, paramType)))
+            var param = Utility.BuildWSStreamParam(subscribeRequestParams);
+            await socket.SendAsync(param, WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+        public WSDataReceiver SubscribeKline(HandleReceivedData handleFunc, params string[] sysmbols)
+        {
+            addHandle(StreamEventTypes.KLINE, handleFunc);
+            addSubscribeParams(sysmbols, "@kline_1m");
+            return this;
+        }
+        public WSDataReceiver SubscribeAggTrade(HandleReceivedData handleFunc, params string[] sysmbols)
+        {
+            addHandle(StreamEventTypes.AGG_TRADE, handleFunc);
+            addSubscribeParams(sysmbols, "@aggTrade");
+            return this;
+        }
+        private void addSubscribeParams(string[] sysmbols, string paramType)
+        {
+            subscribeRequestParams.AddRange(
+               sysmbols.Where(s => !subscribeRequestParams.Any(x => x == string.Concat(s, paramType)))
                        .Select(s => string.Concat(s, paramType))
                );
-            return this;
+        }
+        private void addHandle(string eventType, HandleReceivedData handleFunc)
+        {
+            if (!handlers.ContainsKey(eventType))
+                handlers.Add(eventType, handleFunc);
         }
     }
 }
