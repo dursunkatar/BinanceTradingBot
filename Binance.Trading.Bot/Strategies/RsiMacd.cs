@@ -1,6 +1,7 @@
 ﻿using Binance.Trading.Bot.Enums;
 using Binance.Trading.Bot.Indicators;
 using Binance.Trading.Bot.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,6 +23,13 @@ namespace Binance.Trading.Bot.Strategies
             var result = new List<TradeAdvice>();
 
             var _macd = candles.Macd(24, 52, 18);
+
+            if (_macd.Macd.Any() || _macd.Signal.Any())
+            {
+                Console.WriteLine("Macd Boş!");
+                return new List<TradeAdvice>();
+            }
+
             var _rsi = candles.Rsi(14);
             for (int i = 0; i < candles.Count; i++)
             {

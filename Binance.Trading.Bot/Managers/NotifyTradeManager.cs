@@ -35,9 +35,16 @@ namespace Binance.Trading.Bot.Managers
             lock (obj)
             {
                 candles.Add(kline.Candle);
-                candles.RemoveAll(c => c.Timestamp <= DateTime.Now.AddMinutes(-1));
-                TradeAdvice tradeAdvice = rsiMacd.Forecast(candles);
-                Console.WriteLine("Signal: {0}  Zaman: {1}", tradeAdvice, candles[0].Timestamp);
+                candles.RemoveAll(c => c.Timestamp <= DateTime.Now.AddHours(-1));
+                if (candles.Count > 60)
+                {
+                    TradeAdvice tradeAdvice = rsiMacd.Forecast(candles);
+                    Console.WriteLine("Signal: {0}  Zaman: {1}", tradeAdvice, candles[0].Timestamp);
+                }
+                else
+                {
+                    Console.WriteLine(candles.Count);
+                }
             }
         }
 
