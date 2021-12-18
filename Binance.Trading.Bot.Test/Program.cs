@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Binance.Bot.Examples
+namespace Binance.Trading.Bot.Test
 {
     class Program
     {

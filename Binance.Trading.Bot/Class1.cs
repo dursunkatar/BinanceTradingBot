@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Binance.Bot
+namespace Binance.Trading.Bot
 {
     public class Class1
     {
