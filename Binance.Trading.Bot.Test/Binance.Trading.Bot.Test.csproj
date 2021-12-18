@@ -5,4 +5,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Binance.Trading.Bot\Binance.Trading.Bot.csproj" />
+  </ItemGroup>
+
 </Project>
