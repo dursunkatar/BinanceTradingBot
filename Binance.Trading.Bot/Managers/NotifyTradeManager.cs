@@ -11,34 +11,40 @@ namespace Binance.Trading.Bot.Managers
     {
         private static volatile object obj = new();
         private static readonly List<Candle> candles;
-        private static readonly BinanceWebSocketManager binanceWebSocketManager;
+        private readonly RsiMacd rsiMacd;
+        private readonly BinanceWebSocketManager binanceWebSocketManager;
 
         static NotifyTradeManager()
         {
             candles = new();
+        }
+        public NotifyTradeManager()
+        {
+            rsiMacd = new();
             binanceWebSocketManager = new();
             StartReceiver();
         }
-        private static void StartReceiver()
+        private void StartReceiver()
         {
             _ = binanceWebSocketManager
                    .SubscribeKline(OnKlineDataReceived, "ethusdt")
                    .StartReceiver();
         }
-        private static void OnKlineDataReceived(Kline kline)
+        private void OnKlineDataReceived(Kline kline)
         {
             lock (obj)
             {
                 candles.Add(kline.Candle);
                 candles.RemoveAll(c => c.Timestamp <= DateTime.Now.AddMinutes(-1));
-                Console.WriteLine(candles.Count);
-                Console.WriteLine("Kline: " + kline.Candle.Timestamp);
+                TradeAdvice tradeAdvice = rsiMacd.Forecast(candles);
+                Console.WriteLine("Signal: {0}  Zaman: {1}", tradeAdvice, candles[0].Timestamp);
             }
         }
 
-        public TradeAdvice GetStrategySignal(BaseStrategy strategy)
+        public void GetStrategySignal(BaseStrategy strategy)
         {
-            return TradeAdvice.Buy;
+            TradeAdvice tradeAdvice = strategy.Forecast(candles);
+            Console.WriteLine(tradeAdvice);
         }
         public TradeAdvice _GetStrategySignal(BaseStrategy _strategy)
         {

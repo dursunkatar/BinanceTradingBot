@@ -19,6 +19,7 @@ namespace Binance.Trading.Bot.Test
 
         static void Main(string[] args)
         {
+
             NotifyTradeManager notifyTradeManager = new();
 
 
