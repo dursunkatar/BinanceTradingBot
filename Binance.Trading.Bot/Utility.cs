@@ -12,7 +12,7 @@ namespace Binance.Trading.Bot
 {
     public struct Utility
     {
-        public static string GetWSStreamEventType(string source)
+        private static string getWSStreamEventType(string source)
         {
             Regex regex = new Regex("{\"e\":\"(.*?)\",\"");
             var v = regex.Match(source);
@@ -27,12 +27,13 @@ namespace Binance.Trading.Bot
             return new ArraySegment<byte>(bytes);
         }
 
-        public async static Task<string> GetWSStreamReceivedData(ClientWebSocket socket)
+        public async static Task<(string,string)> GetWSStreamReceivedDataAndType(ClientWebSocket socket)
         {
             var recBytes = new byte[2048];
             var arraySegment = new ArraySegment<byte>(recBytes);
             _ = await socket.ReceiveAsync(arraySegment, CancellationToken.None);
-            return Encoding.UTF8.GetString(recBytes);
+            string data = Encoding.UTF8.GetString(recBytes);
+            return (getWSStreamEventType(data), data);
         }
     }
 }

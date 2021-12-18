@@ -1,4 +1,5 @@
 ﻿using Binance.Trading.Bot.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,12 +45,14 @@ namespace Binance.Trading.Bot
         {
             Task task = new Task(async () =>
             {
-                for (; ; )
+                for (;;)
                 {
-                    string data = await Utility.GetWSStreamReceivedData(socket);
-                    string eventType = Utility.GetWSStreamEventType(data);
-
-
+                    var (eventType, data) = await Utility.GetWSStreamReceivedDataAndType(socket);
+                    if (eventType == StreamEventTypes.KLINE)
+                    {
+                        Kline kline = JsonConvert.DeserializeObject<Kline>(data);
+                        OnKlineDataReceived(kline);
+                    }
                     //Task handleTask = new Task(() => handleDataFunc(jsonString));
                     //handleTask.Start();
                 }
