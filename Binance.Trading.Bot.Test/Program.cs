@@ -10,17 +10,18 @@ namespace Binance.Trading.Bot.Test
     {
         static void OnKlineDataReceived(Kline kline)
         {
-
+            Console.WriteLine("Kline: " + kline.Symbol);
+        }
+        static void OnAggTradeDataReceived(AggTrade aggTrade)
+        {
+            Console.WriteLine("AggTrade: " + aggTrade.Symbol);
         }
         static void Main(string[] args)
         {
             WSDataReceiver wSDataReceiver = new();
             Task t = wSDataReceiver
                           .SubscribeKline(OnKlineDataReceived, "ethusdt", "btcusdt")
-                          .SubscribeAggTrade(s => { }, "ethusdt")
                           .StartReceiver();
-
-
 
             t.Wait();
             Console.ReadLine();

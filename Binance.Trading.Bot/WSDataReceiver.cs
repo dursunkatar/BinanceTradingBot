@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
-using static Binance.Trading.Bot.WSDataReceiver;
 
 namespace Binance.Trading.Bot
 {
@@ -17,8 +16,6 @@ namespace Binance.Trading.Bot
         private HandleReceivedData<Kline> OnKlineDataReceived;
         private HandleReceivedData<AggTrade> OnAggTradeDataReceived;
         public delegate void HandleReceivedData<TResponse>(TResponse data);
-
-
 
         public WSDataReceiver()
         {
@@ -45,20 +42,28 @@ namespace Binance.Trading.Bot
         {
             Task task = new Task(async () =>
             {
-                for (;;)
+                for (; ; )
                 {
-                    var (eventType, data) = await Utility.GetWSStreamReceivedDataAndType(socket);
-                    if (eventType == StreamEventTypes.KLINE)
-                    {
-                        Kline kline = JsonConvert.DeserializeObject<Kline>(data);
-                        OnKlineDataReceived(kline);
-                    }
-                    //Task handleTask = new Task(() => handleDataFunc(jsonString));
-                    //handleTask.Start();
+                    var (eventType, data) = await Utility.GetWSStreamReceivedDataAndEventType(socket);
+                    Task t = new Task(() => callHandleFunc(eventType, data));
+                    t.Start();
                 }
             });
             task.Start();
             return task;
+        }
+        private void callHandleFunc(string eventType, string data)
+        {
+            if (eventType == StreamEventTypes.KLINE && OnKlineDataReceived != null)
+            {
+                Kline kline = JsonConvert.DeserializeObject<Kline>(data);
+                OnKlineDataReceived(kline);
+            }
+            else if (eventType == StreamEventTypes.AGG_TRADE && OnAggTradeDataReceived != null)
+            {
+                AggTrade aggTrade = JsonConvert.DeserializeObject<AggTrade>(data);
+                OnAggTradeDataReceived(aggTrade);
+            }
         }
         private void addSubscribeParams(string[] sysmbols, string paramType)
         {

@@ -27,7 +27,7 @@ namespace Binance.Trading.Bot
             return new ArraySegment<byte>(bytes);
         }
 
-        public async static Task<(string,string)> GetWSStreamReceivedDataAndType(ClientWebSocket socket)
+        public async static Task<(string,string)> GetWSStreamReceivedDataAndEventType(ClientWebSocket socket)
         {
             var recBytes = new byte[2048];
             var arraySegment = new ArraySegment<byte>(recBytes);
