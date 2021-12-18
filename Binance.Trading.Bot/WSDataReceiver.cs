@@ -35,23 +35,22 @@ namespace Binance.Trading.Bot
             Thread readThread = new Thread(
               async delegate (object obj)
               {
-                  byte[] recBytes = new byte[1024];
+                  byte[] recBytes = new byte[2048];
                   while (true)
                   {
                       var arraySegment = new ArraySegment<byte>(recBytes);
                       var receiveAsync = await socket.ReceiveAsync(arraySegment, CancellationToken.None);
                       string jsonString = Encoding.UTF8.GetString(recBytes);
-                      handleDataFunc(jsonString);
+                      Task handleTask = new Task(() => handleDataFunc(jsonString));
+                      handleTask.Start();
                       recBytes = new byte[1024];
                   }
-
               });
-
             readThread.Start();
         }
         private async Task Subscribe()
         {
-            var request = new SubscribeRequest{Id = 1,Params = SubscribeRequestParams};
+            var request = new SubscribeRequest { Id = 1, Params = SubscribeRequestParams };
             string js = JsonConvert.SerializeObject(request);
             byte[] bytes = Encoding.UTF8.GetBytes(js);
             var arraySegment = new ArraySegment<byte>(bytes);
