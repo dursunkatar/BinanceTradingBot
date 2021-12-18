@@ -17,5 +17,8 @@ namespace Binance.Trading.Bot.Models
 
         [JsonProperty("v")]
         public decimal Volume { get; set; }
+
+        [JsonProperty("x")]
+        public bool IsClosed { get; set; }
     }
 }
