@@ -7,8 +7,14 @@ namespace Binance.Trading.Bot.Test
     {
         static void Main(string[] args)
         {
-            ReceiverKlineData receiverKlineData = new();
-            Task t = receiverKlineData.Deneme(s => Console.WriteLine(s));
+            WSDataReceiver wSDataReceiver = new();
+            Task t = wSDataReceiver
+                          .SubscribeKline("ethusdt","btcusdt")
+                          .SubscribeAggTrade("ethusdt")
+                          .StartReceiver();
+
+            wSDataReceiver.handleDataFunc += s => Console.WriteLine(s);
+
             t.Wait();
             Console.ReadLine();
         }
