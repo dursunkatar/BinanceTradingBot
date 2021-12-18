@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Binance.Trading.Bot.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static Binance.Trading.Bot.WSDataReceiver;
 
 namespace Binance.Trading.Bot
 {
@@ -12,14 +13,15 @@ namespace Binance.Trading.Bot
     {
         private readonly ClientWebSocket socket;
         private readonly List<string> subscribeRequestParams;
-        private readonly Dictionary<string, HandleReceivedData> handlers;
+        private HandleReceivedData<Kline> OnKlineDataReceived;
+        private HandleReceivedData<AggTrade> OnAggTradeDataReceived;
+        public delegate void HandleReceivedData<TResponse>(TResponse data);
 
-        public delegate void HandleReceivedData(string data);
+
 
         public WSDataReceiver()
         {
             socket = new();
-            handlers = new();
             subscribeRequestParams = new();
         }
 
@@ -30,41 +32,30 @@ namespace Binance.Trading.Bot
 
             await socket.ConnectAsync(new Uri("wss://stream.binance.com:9443/ws"), CancellationToken.None);
             await subscribe();
-            await ReceiveData();
+            await receiveData();
         }
 
-        private Task ReceiveData()
-        {
-            Task task = new Task(async () =>
-           {
-               byte[] recBytes = new byte[2048];
-               while (true)
-               {
-                   string jsonString = await Utility.GetWSStreamReceivedData(socket);
-
-                   //Task handleTask = new Task(() => handleDataFunc(jsonString));
-                   //handleTask.Start();
-               }
-           });
-            task.Start();
-            return task;
-        }
-        private async Task subscribe()
+        private Task subscribe()
         {
             var param = Utility.BuildWSStreamParam(subscribeRequestParams);
-            await socket.SendAsync(param, WebSocketMessageType.Text, true, CancellationToken.None);
+            return socket.SendAsync(param, WebSocketMessageType.Text, true, CancellationToken.None);
         }
-        public WSDataReceiver SubscribeKline(HandleReceivedData handleFunc, params string[] sysmbols)
+        private Task receiveData()
         {
-            addHandle(StreamEventTypes.KLINE, handleFunc);
-            addSubscribeParams(sysmbols, "@kline_1m");
-            return this;
-        }
-        public WSDataReceiver SubscribeAggTrade(HandleReceivedData handleFunc, params string[] sysmbols)
-        {
-            addHandle(StreamEventTypes.AGG_TRADE, handleFunc);
-            addSubscribeParams(sysmbols, "@aggTrade");
-            return this;
+            Task task = new Task(async () =>
+            {
+                for (; ; )
+                {
+                    string data = await Utility.GetWSStreamReceivedData(socket);
+                    string eventType = Utility.GetWSStreamEventType(data);
+
+
+                    //Task handleTask = new Task(() => handleDataFunc(jsonString));
+                    //handleTask.Start();
+                }
+            });
+            task.Start();
+            return task;
         }
         private void addSubscribeParams(string[] sysmbols, string paramType)
         {
@@ -73,10 +64,17 @@ namespace Binance.Trading.Bot
                        .Select(s => string.Concat(s, paramType))
                );
         }
-        private void addHandle(string eventType, HandleReceivedData handleFunc)
+        public WSDataReceiver SubscribeKline(HandleReceivedData<Kline> onKlineDataReceived, params string[] sysmbols)
         {
-            if (!handlers.ContainsKey(eventType))
-                handlers.Add(eventType, handleFunc);
+            OnKlineDataReceived = onKlineDataReceived;
+            addSubscribeParams(sysmbols, "@kline_1m");
+            return this;
+        }
+        public WSDataReceiver SubscribeAggTrade(HandleReceivedData<AggTrade> onAggTradeDataReceived, params string[] sysmbols)
+        {
+            OnAggTradeDataReceived = onAggTradeDataReceived;
+            addSubscribeParams(sysmbols, "@aggTrade");
+            return this;
         }
     }
 }
