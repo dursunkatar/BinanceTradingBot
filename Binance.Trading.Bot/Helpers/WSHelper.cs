@@ -2,16 +2,15 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Binance.Trading.Bot
+namespace Binance.Trading.Bot.Helpers
 {
-    public struct Utility
+    public struct WSHelper
     {
         private static string getWSStreamEventType(string source)
         {
@@ -33,20 +32,6 @@ namespace Binance.Trading.Bot
             _ = await socket.ReceiveAsync(arraySegment, CancellationToken.None);
             string data = Encoding.UTF8.GetString(recBytes);
             return (getWSStreamEventType(data), data);
-        }
-
-        public static List<decimal?> FixIndicatorOrdering(List<double> items, int outBegIdx, int outNbElement)
-        {
-            var outValues = new List<decimal?>();
-            var validItems = items.Take(outNbElement);
-
-            for (int i = 0; i < outBegIdx; i++)
-                outValues.Add(null);
-
-            foreach (var value in validItems)
-                outValues.Add((decimal?)value);
-
-            return outValues;
         }
     }
 }

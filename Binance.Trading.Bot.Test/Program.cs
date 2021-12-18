@@ -1,4 +1,5 @@
 ﻿using Binance.Trading.Bot.Enums;
+using Binance.Trading.Bot.Managers;
 using Binance.Trading.Bot.Models;
 using Binance.Trading.Bot.Strategies;
 using System;
@@ -27,7 +28,7 @@ namespace Binance.Trading.Bot.Test
 
         static void Main(string[] args)
         {
-            WSDataReceiver wSDataReceiver = new();
+            BinanceWebSocketManager wSDataReceiver = new();
             Task t = wSDataReceiver
                           .SubscribeKline(OnKlineDataReceived, "ethusdt")
                           .StartReceiver();

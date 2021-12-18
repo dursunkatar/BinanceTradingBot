@@ -1,4 +1,5 @@
-﻿using Binance.Trading.Bot.Models;
+﻿using Binance.Trading.Bot.Helpers;
+using Binance.Trading.Bot.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +23,9 @@ namespace Binance.Trading.Bot.Indicators
             {
                 return new MacdItem()
                 {
-                    Macd = Utility.FixIndicatorOrdering(macdValues.ToList(), outBegIdx, outNbElement),
-                    Signal = Utility.FixIndicatorOrdering(signalValues.ToList(), outBegIdx, outNbElement),
-                    Hist = Utility.FixIndicatorOrdering(histValues.ToList(), outBegIdx, outNbElement)
+                    Macd = IndicatorHelper.FixIndicatorOrdering(macdValues.ToList(), outBegIdx, outNbElement),
+                    Signal = IndicatorHelper.FixIndicatorOrdering(signalValues.ToList(), outBegIdx, outNbElement),
+                    Hist = IndicatorHelper.FixIndicatorOrdering(histValues.ToList(), outBegIdx, outNbElement)
                 };
             }
 

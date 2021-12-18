@@ -1,4 +1,5 @@
-﻿using Binance.Trading.Bot.Models;
+﻿using Binance.Trading.Bot.Helpers;
+using Binance.Trading.Bot.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,9 +8,9 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Binance.Trading.Bot
+namespace Binance.Trading.Bot.Managers
 {
-    public class WSDataReceiver
+    public class BinanceWebSocketManager
     {
         private readonly ClientWebSocket socket;
         private readonly List<string> subscribeRequestParams;
@@ -17,7 +18,7 @@ namespace Binance.Trading.Bot
         private HandleReceivedData<Kline> OnKlineDataReceived;
         private HandleReceivedData<AggTrade> OnAggTradeDataReceived;
         public delegate void HandleReceivedData<TResponse>(TResponse data);
-        public WSDataReceiver()
+        public BinanceWebSocketManager()
         {
             socket = new();
             subscribeRequestParams = new();
@@ -33,7 +34,7 @@ namespace Binance.Trading.Bot
         }
         private Task subscribe()
         {
-            var param = Utility.BuildWSStreamParam(subscribeRequestParams);
+            var param = WSHelper.BuildWSStreamParam(subscribeRequestParams);
             return socket.SendAsync(param, WebSocketMessageType.Text, true, CancellationToken.None);
         }
         private Task receiveData()
@@ -42,7 +43,7 @@ namespace Binance.Trading.Bot
             {
                 for (; ; )
                 {
-                    var (eventType, data) = await Utility.GetWSStreamReceivedDataAndEventType(socket);
+                    var (eventType, data) = await WSHelper.GetWSStreamReceivedDataAndEventType(socket);
                     Task t = new Task(() => callHandleFunc(eventType, data));
                     t.Start();
                 }
@@ -70,13 +71,13 @@ namespace Binance.Trading.Bot
                        .Select(s => string.Concat(s, paramType))
                );
         }
-        public WSDataReceiver SubscribeKline(HandleReceivedData<Kline> onKlineDataReceived, params string[] sysmbols)
+        public BinanceWebSocketManager SubscribeKline(HandleReceivedData<Kline> onKlineDataReceived, params string[] sysmbols)
         {
             OnKlineDataReceived = onKlineDataReceived;
             addSubscribeParams(sysmbols, "@kline_1m");
             return this;
         }
-        public WSDataReceiver SubscribeAggTrade(HandleReceivedData<AggTrade> onAggTradeDataReceived, params string[] sysmbols)
+        public BinanceWebSocketManager SubscribeAggTrade(HandleReceivedData<AggTrade> onAggTradeDataReceived, params string[] sysmbols)
         {
             OnAggTradeDataReceived = onAggTradeDataReceived;
             addSubscribeParams(sysmbols, "@aggTrade");

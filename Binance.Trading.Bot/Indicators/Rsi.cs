@@ -1,4 +1,5 @@
-﻿using Binance.Trading.Bot.Models;
+﻿using Binance.Trading.Bot.Helpers;
+using Binance.Trading.Bot.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace Binance.Trading.Bot.Indicators
 
             if (ema == TicTacTec.TA.Library.Core.RetCode.Success)
             {
-                return Utility.FixIndicatorOrdering(rsiValues.ToList(), outBegIdx, outNbElement);
+                return IndicatorHelper.FixIndicatorOrdering(rsiValues.ToList(), outBegIdx, outNbElement);
             }
 
             throw new Exception("Could not calculate RSI!");
@@ -35,7 +36,7 @@ namespace Binance.Trading.Bot.Indicators
 
             if (ema == TicTacTec.TA.Library.Core.RetCode.Success)
             {
-                return Utility.FixIndicatorOrdering(rsiValues.ToList(), outBegIdx, outNbElement);
+                return IndicatorHelper.FixIndicatorOrdering(rsiValues.ToList(), outBegIdx, outNbElement);
             }
 
             throw new Exception("Could not calculate RSI!");

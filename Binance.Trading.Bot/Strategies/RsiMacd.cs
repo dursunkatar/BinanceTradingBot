@@ -1,7 +1,6 @@
 ﻿using Binance.Trading.Bot.Enums;
 using Binance.Trading.Bot.Indicators;
 using Binance.Trading.Bot.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,9 +12,7 @@ namespace Binance.Trading.Bot.Strategies
 
         public override TradeAdvice Forecast(List<Candle> candles)
         {
-            var d= Prepare(candles).LastOrDefault();
-            
-            return d;
+            return Prepare(candles).LastOrDefault();
         }
 
         protected override List<TradeAdvice> Prepare(List<Candle> candles)
