@@ -13,26 +13,24 @@ namespace Binance.Trading.Bot
     {
         private readonly ClientWebSocket socket;
         private readonly List<string> subscribeRequestParams;
+        private readonly string baseUrl = "wss://stream.binance.com:9443/ws";
         private HandleReceivedData<Kline> OnKlineDataReceived;
         private HandleReceivedData<AggTrade> OnAggTradeDataReceived;
         public delegate void HandleReceivedData<TResponse>(TResponse data);
-
         public WSDataReceiver()
         {
             socket = new();
             subscribeRequestParams = new();
         }
-
         public async Task StartReceiver()
         {
             if (socket.State == WebSocketState.Open)
                 return;
 
-            await socket.ConnectAsync(new Uri("wss://stream.binance.com:9443/ws"), CancellationToken.None);
+            await socket.ConnectAsync(new Uri(baseUrl), CancellationToken.None);
             await subscribe();
             await receiveData();
         }
-
         private Task subscribe()
         {
             var param = Utility.BuildWSStreamParam(subscribeRequestParams);
