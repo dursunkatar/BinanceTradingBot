@@ -24,7 +24,7 @@ namespace Binance.Trading.Bot.Strategies
 
             var _macd = candles.Macd(24, 52, 18);
 
-            if (_macd.Macd.Any() || _macd.Signal.Any())
+            if (!_macd.Macd.Any() || !_macd.Signal.Any())
             {
                 Console.WriteLine("Macd Boş!");
                 return new List<TradeAdvice>();

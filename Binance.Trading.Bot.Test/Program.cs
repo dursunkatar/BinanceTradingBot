@@ -1,27 +1,36 @@
-﻿using Binance.Trading.Bot.Enums;
-using Binance.Trading.Bot.Managers;
+﻿using Binance.Trading.Bot.Managers;
 using Binance.Trading.Bot.Models;
-using Binance.Trading.Bot.Strategies;
+using Binance.Trading.Bot.Test.DataAccess;
+using Binance.Trading.Bot.Test.Entities;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Binance.Trading.Bot.Test
 {
     class Program
     {
-        static List<Candle> list = new();
-        static RsiMacd s = new();
         static void OnKlineDataReceived(Kline kline)
         {
-            Console.WriteLine("Kline: " + kline.Candle.Timestamp);
+            using AppDbContext db = new();
+            db.Candles.Add(new CandleEntity
+            {
+                PriceClose = kline.Candle.Close,
+                PriceHigh = kline.Candle.High,
+                PriceLow = kline.Candle.Low,
+                PriceOpen = kline.Candle.Open,
+                SymbolId = 1,
+                Volume = kline.Candle.Volume,
+                Timestamp = kline.Candle.Timestamp,
+                IsClosed = kline.Candle.IsClosed
+            });
+            db.SaveChanges();
         }
 
         static void Main(string[] args)
         {
-
-            NotifyTradeManager notifyTradeManager = new();
-
+            BinanceWebSocketManager binanceWebSocketManager = new();
+            _ = binanceWebSocketManager
+                 .SubscribeKline(OnKlineDataReceived, "ethusdt")
+                 .StartReceiver();
 
             Console.ReadLine();
         }
