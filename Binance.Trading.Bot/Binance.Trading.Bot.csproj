@@ -11,11 +11,9 @@
   <ItemGroup>
     <Reference Include="TA-Lib-Core">
       <HintPath>Lib\TA-Lib-Core.dll</HintPath>
+      <Private>true</Private>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Strategies\" />
   </ItemGroup>
 
 </Project>

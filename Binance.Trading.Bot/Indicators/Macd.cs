@@ -14,7 +14,7 @@ namespace Binance.Trading.Bot.Indicators
             double[] signalValues = new double[source.Count];
             double[] histValues = new double[source.Count];
             var closes = source.Select(x => Convert.ToDouble(x.Close)).ToArray();
-
+           
             var macd = TicTacTec.TA.Library.Core.Macd(0, source.Count - 1, closes,
                 fastPeriod, slowPeriod, signalPeriod, out outBegIdx, out outNbElement, macdValues, signalValues, histValues);
 
