@@ -14,26 +14,14 @@ namespace Binance.Trading.Bot.Test
         static RsiMacd s = new();
         static void OnKlineDataReceived(Kline kline)
         {
-            list.Add(kline.Candle);
-            if (list.Count > 150)
-            {
-                TradeAdvice d = s.Forecast(list);
-                Console.WriteLine(d);
-            }
-            else
-            {
-                Console.WriteLine("Kline: " + kline.Symbol);
-            }
+            Console.WriteLine("Kline: " + kline.Candle.Timestamp);
         }
 
         static void Main(string[] args)
         {
-            BinanceWebSocketManager wSDataReceiver = new();
-            Task t = wSDataReceiver
-                          .SubscribeKline(OnKlineDataReceived, "ethusdt")
-                          .StartReceiver();
+            NotifyTradeManager notifyTradeManager = new();
 
-            t.Wait();
+
             Console.ReadLine();
         }
     }
