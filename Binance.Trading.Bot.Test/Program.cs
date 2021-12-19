@@ -1,4 +1,5 @@
-﻿using Binance.Trading.Bot.Indicators;
+﻿using Binance.Trading.Bot.Enums;
+using Binance.Trading.Bot.Indicators;
 using Binance.Trading.Bot.Managers;
 using Binance.Trading.Bot.Models;
 using Binance.Trading.Bot.Strategies;
@@ -16,10 +17,9 @@ namespace Binance.Trading.Bot.Test
 {
     class Program
     {
-        static void OnKlineDataReceived(Kline kline)
+        static void onTradeSignal(string symbol, TradeAdvice tradeAdvice, string strategy, DateTime date)
         {
-            //if (kline.Candle.IsClosed)
-            Console.WriteLine("Symbol: {0} Tarih: {1} IsClosed: {2}", kline.Symbol, kline.Candle.Timestamp, kline.Candle.IsClosed);
+            Console.WriteLine("Symbol:{0} TradeAdvice:{1} Strategy:{2}, Date:{3}", symbol, tradeAdvice, strategy, date);
         }
 
         static async Task Main(string[] args)
@@ -35,6 +35,7 @@ namespace Binance.Trading.Bot.Test
             BinanceRestApiManager.getLast4hKlineCandlestickData("ETHUSDT").Wait();
 
 
+            NotifyTradeManager.Start(onTradeSignal, "");
 
 
             //using AppDbContext db = new();

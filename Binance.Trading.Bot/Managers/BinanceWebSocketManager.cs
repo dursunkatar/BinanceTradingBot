@@ -57,9 +57,11 @@ namespace Binance.Trading.Bot.Managers
             if (eventType == StreamEventTypes.KLINE && OnKlineDataReceived != null)
             {
                 Kline kline = JsonConvert.DeserializeObject<Kline>(data);
-                kline.Candle.Timestamp = DateTimeHelper.UnixTimestampToDateTime(double.Parse(kline.Candle.UnixTimestamp));
-                OnKlineDataReceived(kline);
-
+                if (kline.Candle.IsClosed)
+                {
+                    kline.Candle.Timestamp = DateTimeHelper.UnixTimestampToDateTime(double.Parse(kline.Candle.UnixTimestamp));
+                    OnKlineDataReceived(kline);
+                }
             }
             else if (eventType == StreamEventTypes.AGG_TRADE && OnAggTradeDataReceived != null)
             {
