@@ -29,6 +29,7 @@ namespace Binance.Trading.Bot.Managers
                 return;
 
             await socket.ConnectAsync(new Uri(baseUrl), CancellationToken.None);
+            Console.WriteLine(socket.State);
             await subscribe();
             await receiveData();
         }
@@ -71,14 +72,14 @@ namespace Binance.Trading.Bot.Managers
         private void addSubscribeParams(string[] sysmbols, string paramType)
         {
             subscribeRequestParams.AddRange(
-               sysmbols.Where(s => !subscribeRequestParams.Any(x => x == string.Concat(s, paramType)))
-                       .Select(s => string.Concat(s, paramType))
+               sysmbols.Where(s => !subscribeRequestParams.Any(x => x == string.Concat(s.Replace("I","i").ToLower(), paramType)))
+                       .Select(s => string.Concat(s.Replace("I", "i").ToLower(), paramType))
                );
         }
         public BinanceWebSocketManager SubscribeKline(HandleReceivedData<Kline> onKlineDataReceived, params string[] sysmbols)
         {
             OnKlineDataReceived = onKlineDataReceived;
-            addSubscribeParams(sysmbols, "@kline_1m");
+            addSubscribeParams(sysmbols, "@kline_3m");
             return this;
         }
         public BinanceWebSocketManager SubscribeAggTrade(HandleReceivedData<AggTrade> onAggTradeDataReceived, params string[] sysmbols)

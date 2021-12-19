@@ -36,16 +36,20 @@ namespace Binance.Trading.Bot.Strategies
                 if (_rsi[i] > 70 && (_macd.Macd[i] - _macd.Signal[i]) < 0)
                 {
                     result.Add(TradeAdvice.Sell);
-                    Console.WriteLine("RSİ: {0}  MACD RESULT: {1}  SIGNAL: {2}", _rsi[i], (_macd.Macd[i] - _macd.Signal[i]), TradeAdvice.Sell);
+                    Console.WriteLine("RSİ: {0}  MACD RESULT: {1}  SIGNAL: {2} Date: {3}  Close: {4}", _rsi[i], (_macd.Macd[i] - _macd.Signal[i]), TradeAdvice.Sell, candles[i].Timestamp, candles[i].Close);
                 }
                 else if (_rsi[i] < 30 && (_macd.Macd[i] - _macd.Signal[i]) > 0)
                 {
                     result.Add(TradeAdvice.Buy);
-                    Console.WriteLine("RSİ: {0}  MACD RESULT: {1}  SIGNAL: {2}", _rsi[i], (_macd.Macd[i] - _macd.Signal[i]), TradeAdvice.Buy);
+                    Console.WriteLine("RSİ: {0}  MACD RESULT: {1}  SIGNAL: {2} Date: {3}  Close: {4}", _rsi[i], (_macd.Macd[i] - _macd.Signal[i]), TradeAdvice.Buy, candles[i].Timestamp, candles[i].Close);
                 }
 
                 else
+                {
                     result.Add(TradeAdvice.Hold);
+                    //Console.WriteLine("RSİ: {0}  MACD RESULT: {1}  SIGNAL: {2} Date: {3}  Close: {4}", _rsi[i], (_macd.Macd[i] - _macd.Signal[i]), TradeAdvice.Hold, candles[i].Timestamp, candles[i].Close);
+                }
+                    
             }
 
             return result;
