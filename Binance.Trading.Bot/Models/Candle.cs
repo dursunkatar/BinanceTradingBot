@@ -24,5 +24,8 @@ namespace Binance.Trading.Bot.Models
 
         [JsonProperty("x")]
         public bool IsClosed { get; set; }
+
+        [JsonProperty("T")]
+        public string UnixTimestamp { get; set; }
     }
 }

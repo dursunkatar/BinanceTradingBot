@@ -32,10 +32,10 @@ namespace Binance.Trading.Bot.Test
             //     .SubscribeKline(OnKlineDataReceived, l.ToArray())
             //     .StartReceiver();
 
-            getLast4hKlineCandlestickData().Wait();
+            BinanceRestApiManager.getLast4hKlineCandlestickData("ETHUSDT").Wait();
 
-    
-            
+
+
 
             //using AppDbContext db = new();
             //var candleEntities = db.Candles.Where(x => x.IsClosed).ToList();

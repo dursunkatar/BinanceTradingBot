@@ -57,11 +57,9 @@ namespace Binance.Trading.Bot.Managers
             if (eventType == StreamEventTypes.KLINE && OnKlineDataReceived != null)
             {
                 Kline kline = JsonConvert.DeserializeObject<Kline>(data);
-                //if (kline.Candle.IsClosed)
-                //{
-                    kline.Candle.Timestamp = DateTimeHelper.UnixTimestampToDateTime(double.Parse(kline.UnixTimestamp));
-                    OnKlineDataReceived(kline);
-                //}
+                kline.Candle.Timestamp = DateTimeHelper.UnixTimestampToDateTime(double.Parse(kline.Candle.UnixTimestamp));
+                OnKlineDataReceived(kline);
+
             }
             else if (eventType == StreamEventTypes.AGG_TRADE && OnAggTradeDataReceived != null)
             {
@@ -72,7 +70,7 @@ namespace Binance.Trading.Bot.Managers
         private void addSubscribeParams(string[] sysmbols, string paramType)
         {
             subscribeRequestParams.AddRange(
-               sysmbols.Where(s => !subscribeRequestParams.Any(x => x == string.Concat(s.Replace("I","i").ToLower(), paramType)))
+               sysmbols.Where(s => !subscribeRequestParams.Any(x => x == string.Concat(s.Replace("I", "i").ToLower(), paramType)))
                        .Select(s => string.Concat(s.Replace("I", "i").ToLower(), paramType))
                );
         }
