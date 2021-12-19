@@ -1,12 +1,12 @@
-﻿using Binance.Trading.Bot.Helpers;
-using Binance.Trading.Bot.Models;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Net.WebSockets;
+using Newtonsoft.Json;
 using System.Threading;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
+using Binance.Trading.Bot.Models;
+using System.Collections.Generic;
+using Binance.Trading.Bot.Helpers;
 
 namespace Binance.Trading.Bot.Managers
 {
@@ -79,7 +79,7 @@ namespace Binance.Trading.Bot.Managers
         public BinanceWebSocketManager SubscribeKline(HandleReceivedData<Kline> onKlineDataReceived, params string[] sysmbols)
         {
             OnKlineDataReceived = onKlineDataReceived;
-            addSubscribeParams(sysmbols, "@kline_3m");
+            addSubscribeParams(sysmbols, "@kline_4h");
             return this;
         }
         public BinanceWebSocketManager SubscribeAggTrade(HandleReceivedData<AggTrade> onAggTradeDataReceived, params string[] sysmbols)

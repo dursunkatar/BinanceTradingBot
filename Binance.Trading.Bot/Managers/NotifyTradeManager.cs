@@ -1,10 +1,10 @@
-﻿using Binance.Trading.Bot.Enums;
-using Binance.Trading.Bot.Models;
-using Binance.Trading.Bot.Strategies;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Binance.Trading.Bot.Enums;
+using Binance.Trading.Bot.Models;
+using System.Collections.Generic;
+using Binance.Trading.Bot.Strategies;
 
 namespace Binance.Trading.Bot.Managers
 {
@@ -41,10 +41,8 @@ namespace Binance.Trading.Bot.Managers
             strategies.Add(new AdxSmas());
             strategies.Add(new BollingerAwe());
             strategies.Add(new EmaStochRsi());
-            //strategies.Add(new RsiBbands());
             strategies.Add(new SarRsi());
             strategies.Add(new SarStoch());
-            //strategies.Add(new SmaStochRsi());
         }
         public async static Task Start(HandleTradeSignal onTradeSignal)
         {
