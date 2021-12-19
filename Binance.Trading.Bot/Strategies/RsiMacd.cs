@@ -18,7 +18,7 @@ namespace Binance.Trading.Bot.Strategies
             return Prepare(candles).LastOrDefault();
         }
 
-        protected override List<TradeAdvice> Prepare(List<Candle> candles)
+        public override List<TradeAdvice> Prepare(List<Candle> candles)
         {
             var result = new List<TradeAdvice>();
 
@@ -26,17 +26,24 @@ namespace Binance.Trading.Bot.Strategies
 
             if (!_macd.Macd.Any() || !_macd.Signal.Any())
             {
-                Console.WriteLine("Macd Boş!");
-                return new List<TradeAdvice>();
+                result.Add(TradeAdvice.Hold);
+                return result;
             }
 
             var _rsi = candles.Rsi(14);
             for (int i = 0; i < candles.Count; i++)
             {
                 if (_rsi[i] > 70 && (_macd.Macd[i] - _macd.Signal[i]) < 0)
+                {
                     result.Add(TradeAdvice.Sell);
+                    Console.WriteLine("RSİ: {0}  MACD RESULT: {1}  SIGNAL: {2}", _rsi[i], (_macd.Macd[i] - _macd.Signal[i]), TradeAdvice.Sell);
+                }
                 else if (_rsi[i] < 30 && (_macd.Macd[i] - _macd.Signal[i]) > 0)
+                {
                     result.Add(TradeAdvice.Buy);
+                    Console.WriteLine("RSİ: {0}  MACD RESULT: {1}  SIGNAL: {2}", _rsi[i], (_macd.Macd[i] - _macd.Signal[i]), TradeAdvice.Buy);
+                }
+
                 else
                     result.Add(TradeAdvice.Hold);
             }

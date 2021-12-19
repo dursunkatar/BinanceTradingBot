@@ -79,7 +79,7 @@ namespace Binance.Trading.Bot.Strategies
                     throw new ArgumentOutOfRangeException(nameof(IdealPeriod));
             }
         }
-        protected abstract List<TradeAdvice> Prepare(List<Candle> candles);
+        public abstract List<TradeAdvice> Prepare(List<Candle> candles);
         public abstract TradeAdvice Forecast(List<Candle> candles);
     }
 }
