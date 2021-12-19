@@ -22,6 +22,10 @@ namespace Binance.Trading.Bot.Managers
             int limit = (24 / 4) * day;
             string res = await HttpHelper.Get(BaseUrl + $"/klines?symbol={symbol}&interval=4h&limit={limit}");
             var items = JsonConvert.DeserializeObject<List<List<object>>>(res);
+            if (items.Count < limit)
+            {
+                return null;
+            }
             foreach (var item in items)
             {
                 candles.Add(new Candle

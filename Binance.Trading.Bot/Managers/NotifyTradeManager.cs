@@ -31,37 +31,43 @@ namespace Binance.Trading.Bot.Managers
             for (int i = 0; i < usdtSymbols.Count; i++)
             {
                 List<Candle> candles = await BinanceRestApiManager.getLast4hKlineCandlestickData(usdtSymbols[i].SymbolName);
-                symbols.Add(usdtSymbols[i].SymbolName, candles);
+                if (candles != null)
+                    symbols.Add(usdtSymbols[i].SymbolName, candles);
             }
         }
         private static void loadStrategies()
         {
             strategies.Add(new RsiMacd());
             strategies.Add(new AdxSmas());
+            strategies.Add(new BollingerAwe());
+            strategies.Add(new EmaStochRsi());
+            //strategies.Add(new RsiBbands());
+            strategies.Add(new SarRsi());
+            strategies.Add(new SarStoch());
+            //strategies.Add(new SmaStochRsi());
         }
-        public async static Task Start(HandleTradeSignal onTradeSignal, params string[] sysmbols)
+        public async static Task Start(HandleTradeSignal onTradeSignal)
         {
             NotifyTradeManager.onTradeSignal = onTradeSignal;
             loadStrategies();
             await loadLast4hKlineCandlestickDataOfSymbols();
             await binanceWebSocketManager
-                   .SubscribeKline(OnKlineDataReceived, sysmbols)
+                   .SubscribeKline(OnKlineDataReceived, symbols.Keys.ToArray())
                    .StartReceiver();
         }
         private static void OnKlineDataReceived(Kline kline)
         {
             bool ok = symbols.TryGetValue(kline.Symbol, out List<Candle> candles);
-            if (ok)
+            if (!ok) return;
+
+            candles.Add(kline.Candle);
+            candles.RemoveAt(0);
+            for (int i = 0; i < strategies.Count; i++)
             {
-                candles.Add(kline.Candle);
-                candles.RemoveAt(0);
-                for (int i = 0; i < strategies.Count; i++)
+                TradeAdvice tradeAdvice = strategies[i].Forecast(candles);
+                if (tradeAdvice != TradeAdvice.Hold)
                 {
-                    TradeAdvice tradeAdvice = strategies[i].Forecast(candles);
-                    if (tradeAdvice != TradeAdvice.Hold)
-                    {
-                        onTradeSignal(kline.Symbol, tradeAdvice, strategies[i].Name, kline.Candle.Timestamp);
-                    }
+                    onTradeSignal(kline.Symbol, tradeAdvice, strategies[i].Name, kline.Candle.Timestamp);
                 }
             }
         }
