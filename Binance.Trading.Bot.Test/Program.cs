@@ -24,15 +24,18 @@ namespace Binance.Trading.Bot.Test
 
         static async Task Main(string[] args)
         {
-            var symbolList = await getAllSymbols();
-            var l = symbolList.Where(x => x.Symbol.EndsWith("USDT")).Select(x => x.Symbol);
+            //var symbolList = await getAllSymbols();
+            //var l = symbolList.Where(x => x.Symbol.EndsWith("USDT")).Select(x => x.Symbol);
 
-            BinanceWebSocketManager binanceWebSocketManager = new();
-            _ = binanceWebSocketManager
-                 .SubscribeKline(OnKlineDataReceived, l.ToArray())
-                 .StartReceiver();
+            //BinanceWebSocketManager binanceWebSocketManager = new();
+            //_ = binanceWebSocketManager
+            //     .SubscribeKline(OnKlineDataReceived, l.ToArray())
+            //     .StartReceiver();
 
+            getLast4hKlineCandlestickData().Wait();
 
+    
+            
 
             //using AppDbContext db = new();
             //var candleEntities = db.Candles.Where(x => x.IsClosed).ToList();
@@ -66,6 +69,17 @@ namespace Binance.Trading.Bot.Test
             var response = await httpClient.SendAsync(request);
             string res = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<SymbolModel>>(res);
+        }
+
+        static async Task<List<List<object>>> getLast4hKlineCandlestickData()
+        {
+            using HttpClient httpClient = new();
+            using var request = new HttpRequestMessage(HttpMethod.Get, "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=4h&limit=6");
+            httpClient.DefaultRequestHeaders.Add("accept", "application/json");
+            var response = await httpClient.SendAsync(request);
+            string res = await response.Content.ReadAsStringAsync();
+            var h = JsonConvert.DeserializeObject<List<List<object>>>(res);
+            return h;
         }
     }
 }
