@@ -61,25 +61,5 @@ namespace Binance.Trading.Bot.Test
 
             Console.ReadLine();
         }
-
-        static async Task<List<SymbolModel>> getAllSymbols()
-        {
-            using HttpClient httpClient = new();
-            using var request = new HttpRequestMessage(HttpMethod.Get, "https://api.binance.com/api/v3/ticker/price");
-            var response = await httpClient.SendAsync(request);
-            string res = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<List<SymbolModel>>(res);
-        }
-
-        static async Task<List<List<object>>> getLast4hKlineCandlestickData()
-        {
-            using HttpClient httpClient = new();
-            using var request = new HttpRequestMessage(HttpMethod.Get, "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=4h&limit=6");
-            httpClient.DefaultRequestHeaders.Add("accept", "application/json");
-            var response = await httpClient.SendAsync(request);
-            string res = await response.Content.ReadAsStringAsync();
-            var h = JsonConvert.DeserializeObject<List<List<object>>>(res);
-            return h;
-        }
     }
 }

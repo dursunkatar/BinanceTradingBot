@@ -1,49 +1,46 @@
 ﻿using Binance.Trading.Bot.Enums;
 using Binance.Trading.Bot.Models;
 using Binance.Trading.Bot.Strategies;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Binance.Trading.Bot.Managers
 {
-    public class NotifyTradeManager
+    public struct NotifyTradeManager
     {
-        private static volatile object obj = new();
-        private static readonly List<Candle> candles;
-        private readonly RsiMacd rsiMacd;
-        private readonly BinanceWebSocketManager binanceWebSocketManager;
+        private static readonly List<BaseStrategy> strategies;
+        private static readonly Dictionary<string, List<Candle>> symbols;
+        private static readonly BinanceWebSocketManager binanceWebSocketManager;
 
         static NotifyTradeManager()
         {
-            candles = new();
-        }
-        public NotifyTradeManager()
-        {
-            rsiMacd = new();
+            symbols = new();
+            strategies = new();
             binanceWebSocketManager = new();
-            StartReceiver();
+            startReceiver();
+            loadStrategies();
         }
-        private void StartReceiver()
+
+        private static void loadStrategies()
+        {
+            strategies.Add(new RsiMacd());
+            strategies.Add(new AdxSmas());
+        }
+        private static void startReceiver()
         {
             _ = binanceWebSocketManager
                    .SubscribeKline(OnKlineDataReceived, "ethusdt")
                    .StartReceiver();
         }
-        private void OnKlineDataReceived(Kline kline)
+        private static void OnKlineDataReceived(Kline kline)
         {
-            lock (obj)
+            bool ok = symbols.TryGetValue(kline.Symbol, out List<Candle> candles);
+            if (ok)
             {
                 candles.Add(kline.Candle);
-                candles.RemoveAll(c => c.Timestamp <= DateTime.Now.AddHours(-1));
-                if (candles.Count > 60)
+                candles.RemoveAt(0);
+                for (int i = 0; i < strategies.Count; i++)
                 {
-                    TradeAdvice tradeAdvice = rsiMacd.Forecast(candles);
-                    Console.WriteLine("Signal: {0}  Zaman: {1}", tradeAdvice, candles[0].Timestamp);
-                }
-                else
-                {
-                    Console.WriteLine(candles.Count);
+                    TradeAdvice tradeAdvice = strategies[i].Forecast(candles);
                 }
             }
         }
