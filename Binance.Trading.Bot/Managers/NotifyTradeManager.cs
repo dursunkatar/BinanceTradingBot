@@ -14,7 +14,7 @@ namespace Binance.Trading.Bot.Managers
         private static readonly List<BaseStrategy> strategies;
         private static readonly Dictionary<string, List<Candle>> symbols;
         private static readonly BinanceWebSocketManager binanceWebSocketManager;
-        public delegate void HandleTradeSignal(string symbol, TradeAdvice tradeAdvice, string strategy, DateTime date);
+        public delegate void HandleTradeSignal(string symbol, TradeAdvice tradeAdvice, string strategy, DateTime date, decimal ClosePrice);
 
         static NotifyTradeManager()
         {
@@ -65,7 +65,7 @@ namespace Binance.Trading.Bot.Managers
                 TradeAdvice tradeAdvice = strategies[i].Forecast(candles);
                 if (tradeAdvice != TradeAdvice.Hold)
                 {
-                    onTradeSignal(kline.Symbol, tradeAdvice, strategies[i].Name, kline.Candle.Timestamp);
+                    onTradeSignal(kline.Symbol, tradeAdvice, strategies[i].Name, kline.Candle.Timestamp, kline.Candle.Close);
                 }
             }
         }

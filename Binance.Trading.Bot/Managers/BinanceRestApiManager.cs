@@ -20,7 +20,7 @@ namespace Binance.Trading.Bot.Managers
         {
             List<Candle> candles = new();
             int limit = (24 / 4) * day;
-            string res = await HttpHelper.Get(BaseUrl + $"/klines?symbol={symbol}&interval=4h&limit={limit}");
+            string res = await HttpHelper.Get(BaseUrl + $"/klines?symbol={symbol}&interval=4h&limit=1000");
             var items = JsonConvert.DeserializeObject<List<List<object>>>(res);
             if (items.Count < limit)
             {
@@ -30,11 +30,11 @@ namespace Binance.Trading.Bot.Managers
             {
                 candles.Add(new Candle
                 {
-                    Open = decimal.Parse(item[1].ToString()),
-                    High = decimal.Parse(item[2].ToString()),
-                    Low = decimal.Parse(item[3].ToString()),
-                    Close = decimal.Parse(item[4].ToString()),
-                    Volume = decimal.Parse(item[5].ToString()),
+                    Open = decimal.Parse(item[1].ToString().Replace(".",",")),
+                    High = decimal.Parse(item[2].ToString().Replace(".", ",")),
+                    Low = decimal.Parse(item[3].ToString().Replace(".", ",")),
+                    Close = decimal.Parse(item[4].ToString().Replace(".", ",")),
+                    Volume = decimal.Parse(item[5].ToString().Replace(".", ",")),
                     UnixTimestamp = item[6].ToString(),
                     Timestamp = DateTimeHelper.UnixTimestampToDateTime(double.Parse(item[6].ToString())),
                     IsClosed = true
