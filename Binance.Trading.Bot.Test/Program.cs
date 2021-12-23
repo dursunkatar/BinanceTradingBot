@@ -11,6 +11,7 @@ namespace Binance.Trading.Bot.Test
     {
         static void onTradeSignal(string symbol, TradeAdvice tradeAdvice, string strategy, DateTime date)
         {
+            int s = 1;
             using AppDbContext db = new();
             db.TradeSignals.Add(new TradeSignal
             {
@@ -20,7 +21,7 @@ namespace Binance.Trading.Bot.Test
                 TradeAdvice = tradeAdvice.ToString()
             });
             db.SaveChanges();
-            Console.WriteLine("Symbol:{0} TradeAdvice:{1} Strategy:{2}, Date:{3}", symbol, tradeAdvice, strategy, date);
+              Console.WriteLine("Symbol:{0} TradeAdvice:{1} Strategy:{2}, Date:{3}", symbol, tradeAdvice, strategy, date);
         }
 
         static async Task Main(string[] args)
