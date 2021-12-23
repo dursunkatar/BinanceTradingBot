@@ -17,6 +17,13 @@ namespace Binance.Trading.Bot.Strategies
             var sma40 = candles.Sma(10);
             var adx = candles.Adx(14);
 
+            if (!adx.Any())
+            {
+                result.Add(TradeAdvice.Hold);
+                return result;
+            }
+               
+
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)

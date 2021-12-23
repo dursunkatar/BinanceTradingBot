@@ -38,10 +38,9 @@ namespace Binance.Trading.Bot.Test
             Console.WriteLine("Symbol:{0} TradeAdvice:{1} Strategy:{2}, Date:{3}", symbol, tradeAdvice, strategy, date);
         }
 
-        static  void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //await NotifyTradeManager.Start(onTradeSignal);
-            int[] ss = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             //using AppDbContext db = new();
             //List<Candle> candles = await BinanceRestApiManager.getLast4hKlineCandlestickData("ONGUSDT");
             //for (int i = 0; i < candles.Count; i++)
@@ -62,51 +61,68 @@ namespace Binance.Trading.Bot.Test
 
             List<BaseStrategy> strategies = new();
             strategies.Add(new RsiMacd());
-            strategies.Add(new AdxSmas());
-            strategies.Add(new BollingerAwe());
-            strategies.Add(new EmaStochRsi());
+            //strategies.Add(new AdxSmas());
+            //strategies.Add(new BollingerAwe());
+            //strategies.Add(new EmaStochRsi());
             strategies.Add(new SarRsi());
-            strategies.Add(new SarStoch());
+            // strategies.Add(new SarStoch());
 
+
+            //var candles = db.Candles.ToList();
+
+            //var symbols = await BinanceRestApiManager.getAllSymbols();
+            //foreach (var symbol in symbols.Where(s => s.SymbolName.EndsWith("USDT")))
+            //{
+            //    List<Candle> candles = await BinanceRestApiManager.getLast4hKlineCandlestickData(symbol.SymbolName);
+            //    Console.WriteLine(symbol.SymbolName);
+            //    Do(candles, strategies, symbol.SymbolName);
+            //}
+
+            List<Candle> candles = await BinanceRestApiManager.getLast4hKlineCandlestickData("BTCUSDT");
+            Console.WriteLine("BTCUSDT");
+            Do(candles, strategies, "BTCUSDT");
+
+            Console.WriteLine("Bitti");
+            Console.ReadLine();
+        }
+
+        static void Do(List<Candle> candles, List<BaseStrategy> strategies, string symbol)
+        {
             using AppDbContext db = new();
-            var candles = db.Candles.ToList();
-
-            int period = 14;
+            int period = 15;
             for (int i = period; i < candles.Count - (period - 1); i++)
             {
-                var _candles = candles.Skip(i).Take(period).Select(x => new Candle
-                {
-                    Close = x.PriceClose,
-                    High = x.PriceHigh,
-                    IsClosed = x.IsClosed,
-                    Low = x.PriceLow,
-                    Open = x.PriceOpen,
-                    Timestamp = x.CloseTime,
-                    Volume = x.Volume,
-                }).ToList();
+                var _candles = candles.Skip(i).Take(period).ToList();
 
                 Candle lastCandle = _candles[_candles.Count - 1];
 
                 for (int j = 0; j < strategies.Count; j++)
                 {
+                    string symbol_strategy = $"{symbol}_{strategies[j].Name}";
                     TradeAdvice tradeAdvice = strategies[j].Forecast(_candles);
-                    if (tradeAdvice != TradeAdvice.Hold)
-                    {
+                    //if (tradeAdvice != TradeAdvice.Hold)
+                    //{
+                        //if (tradeAdviceLastStatus.ContainsKey(symbol_strategy))
+                        //{
+                        //    TradeAdvice lastStatus = tradeAdviceLastStatus.GetValueOrDefault(symbol_strategy);
+                        //    if (lastStatus == tradeAdvice)
+                        //        continue;
+                        //}
+                        //tradeAdviceLastStatus[symbol_strategy] = tradeAdvice;
+
                         db.TradeSignals.Add(new TradeSignal
                         {
                             SignalDate = lastCandle.Timestamp,
                             Strategy = strategies[j].Name,
-                            SysmbolName = "ONGUSDT",
+                            SysmbolName = symbol,
                             TradeAdvice = tradeAdvice.ToString(),
                             ClosePrice = lastCandle.Close
                         });
-                    }
+                   // }
                 }
             }
+            try { db.SaveChanges(); } catch { }
 
-            db.SaveChanges();
-            Console.WriteLine("Bitti");
-            Console.ReadLine();
         }
     }
 }
