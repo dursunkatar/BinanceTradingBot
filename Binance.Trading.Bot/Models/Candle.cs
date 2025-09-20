@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Binance.Trading.Bot.Helpers;
+using Newtonsoft.Json;
 using System;
 
 namespace Binance.Trading.Bot.Models
 {
     public class Candle
     {
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get { return DateTimeHelper.UnixTimestampToDateTime(UnixTimestamp); } }
 
         [JsonProperty("o")]
         public decimal Open { get; set; }
@@ -26,6 +27,6 @@ namespace Binance.Trading.Bot.Models
         public bool IsClosed { get; set; }
 
         [JsonProperty("T")]
-        public string UnixTimestamp { get; set; }
+        public long UnixTimestamp { get; set; }
     }
 }

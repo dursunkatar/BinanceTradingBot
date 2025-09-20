@@ -3,7 +3,7 @@ namespace Binance.Trading.Bot.Helpers
 {
     internal struct DateTimeHelper
     {
-        public static DateTime UnixTimestampToDateTime(double unixTime)
+        public static DateTime UnixTimestampToDateTime(long unixTime)
         {
             DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             dateTime = dateTime.AddMilliseconds(unixTime).ToLocalTime();
