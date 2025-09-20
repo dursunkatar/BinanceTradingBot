@@ -2,6 +2,7 @@
 using Binance.Trading.Bot.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Binance.Trading.Bot.Managers
@@ -30,13 +31,12 @@ namespace Binance.Trading.Bot.Managers
             {
                 candles.Add(new Candle
                 {
-                    Open = decimal.Parse(item[1].ToString().Replace(".",",")),
-                    High = decimal.Parse(item[2].ToString().Replace(".", ",")),
-                    Low = decimal.Parse(item[3].ToString().Replace(".", ",")),
-                    Close = decimal.Parse(item[4].ToString().Replace(".", ",")),
-                    Volume = decimal.Parse(item[5].ToString().Replace(".", ",")),
-                    UnixTimestamp = item[6].ToString(),
-                    Timestamp = DateTimeHelper.UnixTimestampToDateTime(double.Parse(item[6].ToString())),
+                    Open = decimal.Parse((string)item[1], CultureInfo.InvariantCulture),
+                    High = decimal.Parse((string)item[2], CultureInfo.InvariantCulture),
+                    Low = decimal.Parse((string)item[3], CultureInfo.InvariantCulture),
+                    Close = decimal.Parse((string)item[4], CultureInfo.InvariantCulture),
+                    Volume = decimal.Parse((string)item[5], CultureInfo.InvariantCulture),
+                    UnixTimestamp = (long)item[6],
                     IsClosed = true
                 });
             }

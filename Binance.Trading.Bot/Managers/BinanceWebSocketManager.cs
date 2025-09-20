@@ -59,7 +59,6 @@ namespace Binance.Trading.Bot.Managers
                 Kline kline = JsonConvert.DeserializeObject<Kline>(data);
                 if (kline.Candle.IsClosed)
                 {
-                    kline.Candle.Timestamp = DateTimeHelper.UnixTimestampToDateTime(double.Parse(kline.Candle.UnixTimestamp));
                     OnKlineDataReceived(kline);
                 }
             }
